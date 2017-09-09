@@ -2,7 +2,7 @@
 set -e
 
 # List of etcd servers (http://ip:port), comma separated
-export ETCD_ENDPOINTS=
+export ETCD_ENDPOINTS=http://172.17.4.51:2379
 
 # Specify the version (vX.Y.Z) of Kubernetes assets to deploy
 export K8S_VER=v1.7.3_coreos.0
