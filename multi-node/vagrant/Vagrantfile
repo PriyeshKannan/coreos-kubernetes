@@ -49,6 +49,7 @@ def workerIP(num)
 end
 
 controllerIPs = [*1..$controller_count].map{ |i| controllerIP(i) } <<  CONTROLLER_CLUSTER_IP
+controllerIPs.push("192.168.2.7")
 etcdIPs = [*1..$etcd_count].map{ |i| etcdIP(i) }
 initial_etcd_cluster = etcdIPs.map.with_index{ |ip, i| "e#{i+1}=http://#{ip}:2380" }.join(",")
 etcd_endpoints = etcdIPs.map.with_index{ |ip, i| "http://#{ip}:2379" }.join(",")
@@ -155,6 +156,7 @@ Vagrant.configure("2") do |config|
       env_file.close
 
       controller.vm.hostname = vm_name
+      controller.vm.network "forwarded_port", guest: 443, host: 50192
 
       ["vmware_fusion", "vmware_workstation"].each do |vmware|
         controller.vm.provider vmware do |v|
@@ -179,6 +181,7 @@ Vagrant.configure("2") do |config|
       attach_volumes(controller, $node_disk_sizes)
 
       # Each controller gets the same cert
+      puts "* controllerIPs is defined: %s" % [controllerIPs]
       provisionMachineSSL(controller,"apiserver","kube-apiserver-#{controllerIP}",controllerIPs)
 
       controller.vm.provision :file, :source => env_file, :destination => "/tmp/coreos-kube-options.env"
